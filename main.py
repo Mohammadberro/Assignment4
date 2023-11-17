@@ -1,39 +1,32 @@
+# importing json to turn drivers text file into a dictionary
 import json
 
 
-def save_text(directory):
+# load list cities from text file
+def load_text_city(directory):
     with open(directory, 'r') as f:
-        for line in f:
-            cities = line.split(", ")
+        line = f.read()
+        cities = line.split(", ")
     return cities
 
 
-def save_text_drivers(directory):
+# load drivers as a dictionary from text file
+def load_text_drivers(directory):
     with open(directory, 'r') as f:
         lines = f.read()
         new_lines = json.loads(lines)
         drivers = new_lines
-        f.close()
     return drivers
 
 
+# updating drivers whenever we add or modify drivers to our driver's text file
 def update_drivers(new_drivers):
-
     string = json.dumps(new_drivers)
     with open("drivers.txt", 'w') as file:
         file.write(string)
-        file.close()
 
 
-# Created a list of cities that initially contains the most populated cities in Lebanon.
-# More ciities can be added during the Main Program
-
-
-# Creating an empty dictionary of drivers, which will be used to store drivers and their route.
-
-
-# We call this function to add a city to our global list of cities.
-# Note that a city will only be added if the city name is not already in the list, avoiding duplicate city names.
+# Add a city to our global list of cities. Avoiding duplicates.
 def add_city(city_name):
     if city_name not in cities:
         cities.append(city_name)
@@ -49,9 +42,7 @@ def add_city(city_name):
         print(f"{city_name} is already in the list of cities.")
 
 
-# We call this funtion to add a new driver to drivers dictionary.
-# Note that a new driver name will only be added if the name does not exist, so that a driver doesn't get added twice.
-# Any city in the route should be among our global list of cities, insuring additional validation.
+# Adding a driver to driver's dictionary. Avoiding duplicates and ensuring valid cities.
 
 def add_driver(driver_name, route):
     if driver_name not in drivers:
@@ -67,10 +58,7 @@ def add_driver(driver_name, route):
         print(f"Driver {driver_name} is already added to the list of drivers.")
 
 
-# We call this funtion to add a city to the driver's(key) route(value).
-# First we make sure the driver's and city's names are valid to avoid errors and ensure validation.
-# The option represents the index of the route , so we make sure that the option is a digit.
-# Any option that does not represent the index of the route will not be processed.(not between -1 and len(route_list))
+# Adding a city to the driver's(key) route(value). Taking accepted indexes only.
 
 def add_city_to_route(driver_name, city_name):
     if driver_name in drivers:
@@ -99,6 +87,7 @@ def add_city_to_route(driver_name, city_name):
         print("Driver's name does not exist in the list of drivers.")
 
 
+# If the driver and city names exists in our data, this function removes the city and updates the driver's route.
 def remove_city_from_route(driver_name, city_name):
     if driver_name in drivers:
         if city_name in drivers[driver_name]:
@@ -110,6 +99,7 @@ def remove_city_from_route(driver_name, city_name):
         print(f"The following name: {driver_name} does not exist in list of drivers.")
 
 
+# Check if any driver has the wanted city in his route. Showing results to the user.
 def check_deliverability(city_name):
     available_drivers = []
     if city_name in cities:
@@ -122,41 +112,49 @@ def check_deliverability(city_name):
         print(f"There are no drivers heading to {city_name}")
 
 
-cities = save_text("cities.txt")
-drivers = save_text_drivers("drivers.txt")
-while True:
-    # print(f"{cities}, \n{drivers}")
-    print("Hello! Enter your choice:\n1. To add a city\n2. To add a driver\n3. To add a city to the route of a driver"
-          "\n4. To remove a city from a driver's route\n5. To check the availability of a delivery")
+# Loading cities and drivers from existing text files.
+cities = load_text_city("cities.txt")
+drivers = load_text_drivers("drivers.txt")
 
-    option = input("What do you want to do?\t")
+# Main program.
+while True:
+    print("Hello! Enter your choice:\n1. To add a city\n2. To add a driver\n3. To add a city to the route of a driver"
+          "\n4. To remove a city from a driver's route\n5. To check the availability of a delivery\n")
+    option = input("")
+    while not option.isdigit() or not (0 < int(option) <= 6):
+        option = input("Please enter a valid option\t")
     if option.isdigit() and 0 < int(option) <= 6:
+        # Adding a city
         if option == "1":
             city_name = input("\nEnter the Name of the City you want to add.\t")
-            if city_name.isalpha():
-                add_city(city_name)
-            else:
+            # Ensuring valid inputs.
+            while not city_name.isalpha():
                 city_name = input("Please enter a valid city name\t")
-
+            add_city(city_name)
+        # Adding a driver
         elif option == "2":
             driver_name = input("Enter the driver's name?:\t")
+            # Ensuring valid inputs.
+            while not driver_name.isalpha():
+                driver_name = input("Enter the driver's name?:\t")
             route = input("Enter the route of the driver: \t").split()
             add_driver(driver_name, route)
 
+        # Adding a city to a route
         elif option == "3":
             driver_name = input("Enter the driver's name:\t")
             city_name = input("\nEnter the Name of the city you want to add.\t")
             add_city_to_route(driver_name, city_name)
-
+        # Removing a city from a driver's route
         elif option == "4":
             driver_name = input("Enter the driver's name:\t")
             city_name = input("\nEnter the Name of the city you want to add.\t")
             remove_city_from_route(driver_name, city_name)
+        # Checking deliverability
         elif option == "5":
             city_name = input("\nEnter the Name of the city you want to deliver to.\t")
             check_deliverability(city_name)
+        # Break-exit the program
         elif option == "6":
             print("Exiting the program...")
             break
-    else:
-        print("Please enter a valid option")
