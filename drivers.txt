@@ -1,2 +1,1 @@
-Mohammad [Beirut,Jbeil]
-Alex [Beirut,Tripoli,Jbeil]
+{"Mohammad": ["Beirut", "Jbeil"], "Alex": ["Beirut", "Tripoli", "Jbeil"], "Abbass": ["Beirut", "Jbeil", "Tripoli"]}

@@ -1,3 +1,6 @@
+import json
+
+
 def save_text(directory):
     with open(directory, 'r') as f:
         for line in f:
@@ -6,12 +9,20 @@ def save_text(directory):
 
 
 def save_text_drivers(directory):
-    drivers = {}
     with open(directory, 'r') as f:
-        for line in f:
-            (key, val) = line.split()
-            drivers[key] = val
+        lines = f.read()
+        new_lines = json.loads(lines)
+        drivers = new_lines
+        f.close()
     return drivers
+
+
+def update_drivers(new_drivers):
+
+    string = json.dumps(new_drivers)
+    with open("drivers.txt", 'w') as file:
+        file.write(string)
+        file.close()
 
 
 # Created a list of cities that initially contains the most populated cities in Lebanon.
@@ -50,6 +61,7 @@ def add_driver(driver_name, route):
                       f"to the route")
                 return
         drivers[driver_name] = route
+        update_drivers(drivers)
         print(f"Driver {driver_name} was added to list of drivers")
     else:
         print(f"Driver {driver_name} is already added to the list of drivers.")
@@ -65,7 +77,7 @@ def add_city_to_route(driver_name, city_name):
         if city_name in cities:
             option = input("Enter: \n1. To add the city to the beginning of the route\n-1. To add to the end of the "
                            "route\n#. (any other number) to add that city to the given index.")
-            if option.isdigit():
+            if option.isdigit() or option == "-1":
                 option = int(option)
                 if option == 1:
                     drivers[driver_name].insert(0, city_name)
@@ -73,6 +85,10 @@ def add_city_to_route(driver_name, city_name):
                     drivers[driver_name].append(city_name)
                 elif 0 <= option < len(drivers[driver_name]):
                     drivers[driver_name].insert(option, city_name)
+                else:
+                    print("Index is invalid. Please try again and enter a valid index.")
+                    return
+                update_drivers(drivers)
             else:
                 print("Index is invalid. Please try again and enter a valid index.")
         else:
@@ -87,6 +103,7 @@ def remove_city_from_route(driver_name, city_name):
     if driver_name in drivers:
         if city_name in drivers[driver_name]:
             drivers[driver_name].remove(city_name)
+            update_drivers(drivers)
         else:
             print(f"{city_name} is not listed in the route of {driver_name}")
     else:
@@ -108,7 +125,7 @@ def check_deliverability(city_name):
 cities = save_text("cities.txt")
 drivers = save_text_drivers("drivers.txt")
 while True:
-    print(f"{cities}, \n{drivers}")
+    # print(f"{cities}, \n{drivers}")
     print("Hello! Enter your choice:\n1. To add a city\n2. To add a driver\n3. To add a city to the route of a driver"
           "\n4. To remove a city from a driver's route\n5. To check the availability of a delivery")
 
